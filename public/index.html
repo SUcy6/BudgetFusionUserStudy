@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BudgetFusion User Study</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script> <!-- Include D3.js -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<center>
+    <h1>BudgetFusion User Study</h1>
+    <div id="instruction-container">
+        <p>In each trial, you will see three images: a reference image, and 2 test images (Image A and Image B).</p>
+        <p>Your task is to select the image that is more similar to the reference image.</p>
+        <p>Click on the button below or press keyboard to make the selection.</p>
+        <p>Enter a user name below to start the trial. If you do not enter a name, a random name will be given to you.</p>
+        <p>In the end, click on the "Finish and Download CSV" button to download the results.</p>
+    </div>
+    <div id="participant-container">
+        <label for="participant-name">Participant Name:</label>
+        <input type="text" id="participant-name" placeholder="Your Name" required>
+        <button id="start-button">Start Selection</button>
+    </div>
+    <br>
+    <div id="reference-image-container">
+        <img id="imgRef" src="" alt="Reference Image" width="200">
+        <h3>Reference Image</h3>
+    </div>
+    <div id="image-container">
+        <img id="imgA" src="" alt="Image A" width="200">
+        <img id="imgB" src="" alt="Image B" width="200">
+        <h3>Image A Image B</h3>
+    </div>
+    <div id="buttons-container">
+        <button id="selectImgA">Select Image A</button>
+        <button id="selectImgB">Select Image B</button>
+    </div>
+    <button id="finish">Finish and Download CSV</button>
+</center>
+
+    <script src="script.js"></script>
+</body>
+</html>
