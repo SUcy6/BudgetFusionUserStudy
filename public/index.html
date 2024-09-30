@@ -22,15 +22,29 @@
         <input type="text" id="participant-name" placeholder="Your Name" required>
         <button id="start-button">Start Selection</button>
     </div>
-    <br>
+    <div id="progress-section" style="text-align: center; margin-top: 20px;">
+        <div id="progress-tracker">
+            Trial <span id="current-trial">1</span> / <span id="total-trials">0</span>
+        </div>
+        <div id="progress-container" style="width: 80%; background-color: #f3f3f3; border-radius: 25px; margin: 20px auto;">
+            <div id="progress-bar" style="width: 0%; height: 25px; background-color: #008080; border-radius: 25px;"></div>
+        </div>
+    </div>
     <div id="reference-image-container">
-        <img id="imgRef" src="" alt="Reference Image" width="200">
-        <h3>Reference Image</h3>
+        <img id="imgRef" src="" alt="Reference Image" width="350">
+        <h4>Reference Image</h4>
     </div>
     <div id="image-container">
-        <img id="imgA" src="" alt="Image A" width="200">
-        <img id="imgB" src="" alt="Image B" width="200">
-        <h3>Image A Image B</h3>
+        <div class="image-row">
+            <div class="image-box">
+                <img id="imgA" class="image">
+                <h4 id="imgAText">Image A</h4>
+            </div>
+            <div class="image-box">
+                <img id="imgB" class="image">
+                <h4 id="imgBText">Image B</h4>
+            </div>
+        </div>
     </div>
     <div id="buttons-container">
         <button id="selectImgA">Select Image A</button>

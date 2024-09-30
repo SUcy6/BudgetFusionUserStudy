@@ -18,6 +18,7 @@ let trialNum = 1; // Start with trial 1
 let participantName = ""; // Generate random participant name
 let testImages = [];
 let refImages = [];
+let trialDelay = 500; // 1 second delay between trials
 
 // Function to shuffle an array randomly
 function shuffleArray(array) {
@@ -27,7 +28,6 @@ function shuffleArray(array) {
     }
     return array;
 }
-
 
 // Fetch images dynamically from the server
 async function fetchImages() {
@@ -45,9 +45,12 @@ async function fetchImages() {
     // Shuffle test images for randomness
     testImages = shuffleArray(testImages);
 
-    loadImages(); // Start the task by loading the first set of images
-}
+    // Set the total number of trials at the start
+    document.getElementById('total-trials').innerText = testImages.length;
 
+    // Start the task by loading the first set of images after a blank screen
+    loadTrialWithDelay();
+}
 
 // Randomly select a reference image for the current trial
 function getRandomRefImage() {
@@ -55,9 +58,31 @@ function getRandomRefImage() {
     return refImages[randomIndex];
 }
 
+// Display blank screen for a given amount of time
+function showBlankScreen(callback) {
+    document.getElementById('image-container').style.display = 'none';
+    document.getElementById('reference-image-container').style.display = 'none';
+    document.getElementById('buttons-container').style.display = 'none';
+    document.getElementById('progress-section').style.display = 'none';
+
+    setTimeout(() => {
+        callback();
+    }, trialDelay);
+}
+
+// Function to update the progress bar
+function updateProgressBar() {
+    const progressPercent = (trialNum / testImages.length) * 100;
+    document.getElementById('progress-bar').style.width = progressPercent + '%';
+}
+
 // Load the images for the current trial
 function loadImages() {
     if (trialNum <= testImages.length) {
+        // Update the trial number and progress bar
+        document.getElementById('current-trial').innerText = trialNum;
+        updateProgressBar();
+
         // Show the reference image first
         const imgRefSrc = getRandomRefImage();
         document.getElementById('imgRef').src = imgRefSrc;
@@ -68,25 +93,46 @@ function loadImages() {
         // Display the shuffled test images (imgA and imgB)
         document.getElementById('imgA').src = currentTestImages[0];
         document.getElementById('imgB').src = currentTestImages[1];
+
+        // Show the image container again after the blank screen
+        document.getElementById('image-container').style.display = 'block';
+        document.getElementById('reference-image-container').style.display = 'block';
+        document.getElementById('buttons-container').style.display = 'block';
+        document.getElementById('progress-section').style.display = 'block';
     } else {
         // Hide the image container and show the finish button when all trials are completed
         document.getElementById('finish').style.display = 'block';
         document.getElementById('reference-image-container').style.display = 'none';
         document.getElementById('image-container').style.display = 'none';
         document.getElementById('buttons-container').style.display = 'none';
-        document.getElementById('reference-image-container').style.display = 'none';
     }
+}
+
+// Load the trial with a delay (blank screen in between)
+function loadTrialWithDelay() {
+    showBlankScreen(() => {
+        loadImages(); // Load the next pair of images after the blank screen
+    });
 }
 
 // Record the selection and proceed to the next trial
 document.getElementById('selectImgA').addEventListener('click', function() {
-    recordSelection(true); // User selected Image A
+    handleSelection(true, 'selectImgA'); // User selected Image A
 });
 
 document.getElementById('selectImgB').addEventListener('click', function() {
-    recordSelection(false); // User selected Image B
+    handleSelection(false, 'selectImgB'); // User selected Image B
 });
 
+// Handle selection and ensure button highlight before blank screen
+function handleSelection(isImgASelected, buttonId) {
+    highlightButton(buttonId); // Highlight the button for feedback
+    setTimeout(() => {
+        recordSelection(isImgASelected); // Proceed to record selection after the highlight effect
+    }, 300); // Wait for button highlight effect to finish before recording selection
+}
+
+// Record the selection and load the next trial after a delay (blank screen)
 function recordSelection(isImgASelected) {
     // Store the current trial data
     const currentRefImage = document.getElementById('imgRef').src.replace(window.location.origin, '');  // Get the current reference image
@@ -101,7 +147,7 @@ function recordSelection(isImgASelected) {
     });
 
     trialNum++; // Increment the trial number
-    loadImages(); // Load the next pair of images
+    loadTrialWithDelay(); // Show blank screen and load the next trial
 }
 
 function highlightButton(buttonId) {
@@ -111,17 +157,15 @@ function highlightButton(buttonId) {
     // Remove the highlight after 300ms to simulate a brief effect
     setTimeout(() => {
         button.classList.remove('selected');
-    }, 300);
+    }, 500);
 }
 
 // Listen for keypresses to select imgA or imgB
 document.addEventListener('keydown', function(event) {
     if (event.key === 'a' || event.key === 'A') {
-        highlightButton('selectImgA'); // Highlight the button for imgA
-        recordSelection(true);  // User selected Image A with 'A' key
+        handleSelection(true, 'selectImgA');  // User selected Image A with 'A' key
     } else if (event.key === 'b' || event.key === 'B') {
-        highlightButton('selectImgB'); // Highlight the button for imgB
-        recordSelection(false);  // User selected Image B with 'B' key
+        handleSelection(false, 'selectImgB');  // User selected Image B with 'B' key
     }
 });
 
@@ -137,13 +181,15 @@ document.getElementById('start-button').addEventListener('click', function() {
     }
 
     document.getElementById('participant-container').style.display = 'none'; // Hide the name input section
-    // Show the image containers and buttons
+    // Show the image containers and buttons 
     document.getElementById('reference-image-container').style.display = 'block';
     document.getElementById('image-container').style.display = 'block';
     document.getElementById('buttons-container').style.display = 'block';
-    fetchImages(); // Fetch images and start the experiment
-});
+    document.getElementById('progress-section').style.display = 'block';
 
+    // Fetch images and start the experiment
+    fetchImages();
+});
 
 // Generate and download the CSV after all trials
 document.getElementById('finish').addEventListener('click', function() {
@@ -167,6 +213,3 @@ function downloadCSV() {
     link.click(); // Programmatically click the link to trigger download
     document.body.removeChild(link); // Clean up
 }
-
-// Fetch images and initialize the task
-fetchImages();

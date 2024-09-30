@@ -4,6 +4,23 @@
     transition: background-color 0.1s ease; /* Smooth transition effect */
 }
 
-#finish, #reference-image-container, #image-container, #buttons-container{
+#finish, #reference-image-container, #image-container, #buttons-container, #progress-section{
     display: none; /* Hide finish button initially */
+}
+
+.image-row {
+    display: flex;
+    justify-content: center;
+    gap: 50px; /* Space between images */
+    margin-top: 20px;
+}
+
+/* Style for each image and its caption */
+.image-box {
+    text-align: center;
+}
+
+.image {
+    width: 350px;
+    height: auto;
 }
