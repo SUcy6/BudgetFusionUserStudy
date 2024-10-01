@@ -24,3 +24,48 @@
     width: 350px;
     height: auto;
 }
+
+/* The sidebar styling */
+.sidebar {
+    height: 100%; /* Full-height */
+    width: 0; /* Start hidden */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0;
+    right: 0; /* Sidebar on the right side */
+    background-color: #f3e3ac; /* Black background color */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content below the header */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
+}
+
+/* Sidebar links */
+.sidebar a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+/* Sidebar close button */
+.sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+/* When the sidebar is open */
+.sidebar.open {
+    width: 350px; /* Set the width of the sidebar when open */
+}
+
+/* Main content adjustment when sidebar is open */
+#main-content {
+    transition: margin-right 0.5s;
+    padding: 16px;
+}
+

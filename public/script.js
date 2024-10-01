@@ -105,6 +105,7 @@ function loadImages() {
         document.getElementById('reference-image-container').style.display = 'none';
         document.getElementById('image-container').style.display = 'none';
         document.getElementById('buttons-container').style.display = 'none';
+        document.getElementById('open-sidebar-btn').style.display = 'none';
     }
 }
 
@@ -169,6 +170,16 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
+function openNav() {
+    document.getElementById("instruction-sidebar").classList.add("open");
+    document.getElementById("main-content").style.marginRight = "250px"; // Push main content when sidebar opens
+}
+
+function closeNav() {
+    document.getElementById("instruction-sidebar").classList.remove("open");
+    document.getElementById("main-content").style.marginRight = "0"; // Reset main content position
+}
+
 // Start the experiment when the user enters their name or auto-generates a name
 document.getElementById('start-button').addEventListener('click', function() {
     const inputName = document.getElementById('participant-name').value;
@@ -186,9 +197,15 @@ document.getElementById('start-button').addEventListener('click', function() {
     document.getElementById('image-container').style.display = 'block';
     document.getElementById('buttons-container').style.display = 'block';
     document.getElementById('progress-section').style.display = 'block';
+    
+    document.getElementById('instruction-container').style.display = 'none';
 
     // Fetch images and start the experiment
     fetchImages();
+
+    // Show the sidebar toggle button after the trial starts
+    document.getElementById('open-sidebar-btn').style.display = 'block'; 
+    document.getElementById('instruction-sidebar').style.display = 'block'; // Show the sidebar initially
 });
 
 // Generate and download the CSV after all trials

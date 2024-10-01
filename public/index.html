@@ -8,8 +8,19 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="instruction-sidebar" class="sidebar" style="display: none;">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div id="sidebar-content">
+            <h2>Instructions</h2>
+            <p>In each trial, you will see three images: a reference image, and 2 test images (Image A and Image B).</p>
+            <p>Your task is to select the image that is more similar to the reference image.</p>
+            <p>Click on the button below or press keyboard to make the selection.</p>
+            <p>In the end, click on the "Finish and Download CSV" button to download the results.</p>
+        </div>
+    </div>
 <center>
     <h1>BudgetFusion User Study</h1>
+    <button id="open-sidebar-btn" onclick="openNav()" style="display: none;">Show Instructions</button>
     <div id="instruction-container">
         <p>In each trial, you will see three images: a reference image, and 2 test images (Image A and Image B).</p>
         <p>Your task is to select the image that is more similar to the reference image.</p>
@@ -50,7 +61,11 @@
         <button id="selectImgA">Select Image A</button>
         <button id="selectImgB">Select Image B</button>
     </div>
-    <button id="finish">Finish and Download CSV</button>
+    <div id="finish">
+        <p>Thanks for participating in the study.</p>
+        <p>Please click on the "Finish and Download CSV" button to download the results.</p>
+        <button>Finish and Download CSV</button>
+    </div>
 </center>
 
     <script src="script.js"></script>
