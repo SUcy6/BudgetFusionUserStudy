@@ -15,7 +15,7 @@
             <p>In each trial, you will see three images: a reference image, and 2 test images (Image A and Image B).</p>
             <p>Your task is to select the image that is more similar to the reference image.</p>
             <p>Click on the button below or press keyboard to make the selection.</p>
-            <p>In the end, click on the "Finish and Download CSV" button to download the results.</p>
+            <p>In the end, click on the "Finish and Upload CSV" button to submit the results.</p>
         </div>
     </div>
 <center>
@@ -25,11 +25,11 @@
         <p>In each trial, you will see three images: a reference image, and 2 test images (Image A and Image B).</p>
         <p>Your task is to select the image that is more similar to the reference image.</p>
         <p>Click on the button below or press keyboard to make the selection.</p>
-        <p>Enter a user name below to start the trial. If you do not enter a name, a random name will be given to you.</p>
+        <p>Enter your unique Prolific ID below to start the trial. If you do not enter a name, a random name will be given to you.</p>
         <p>In the end, click on the "Finish and Download CSV" button to download the results.</p>
     </div>
     <div id="participant-container">
-        <label for="participant-name">Participant Name:</label>
+        <label for="participant-name">Participant ID:</label>
         <input type="text" id="participant-name" placeholder="Your Name" required>
         <button id="start-button">Start Selection</button>
     </div>
@@ -63,9 +63,16 @@
     </div>
     <div id="finish">
         <p>Thanks for participating in the study.</p>
-        <p>Please click on the "Finish and Download CSV" button to download the results.</p>
-        <button>Finish and Download CSV</button>
+        <p>Please click on the "Finish and Upload CSV" button to upload the results.</p>
+        <p>After you have successfully submitted the result, you will be redirected back to Prolific.</p>
+        <button>Finish and Upload CSV</button>
     </div>
+    <!-- <div id="completion-message">
+        <div class="message-box">
+            <h1>Thanks for participating in the study.</h1>
+            <p>Here is the completion code:C1K1TEJ3</p>
+        </div>
+    </div> -->
 </center>
 
     <script src="script.js"></script>

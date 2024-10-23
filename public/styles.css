@@ -4,7 +4,7 @@
     transition: background-color 0.1s ease; /* Smooth transition effect */
 }
 
-#finish, #reference-image-container, #image-container, #buttons-container, #progress-section{
+#finish, #reference-image-container, #image-container, #buttons-container, #progress-section, #completion-message{
     display: none; /* Hide finish button initially */
 }
 
@@ -67,5 +67,35 @@
 #main-content {
     transition: margin-right 0.5s;
     padding: 16px;
+}
+
+#completion-message {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#completion-message .message-box {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#completion-message .message-box h1 {
+    color: #4CAF50;
+}
+
+#completion-message .message-box p {
+    font-size: 18px;
+    color: #555555;
 }
 

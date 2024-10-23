@@ -64,6 +64,7 @@ function showBlankScreen(callback) {
     document.getElementById('reference-image-container').style.display = 'none';
     document.getElementById('buttons-container').style.display = 'none';
     document.getElementById('progress-section').style.display = 'none';
+    // document.getElementById('completion-message').style.display = 'none';
 
     setTimeout(() => {
         callback();
@@ -99,6 +100,7 @@ function loadImages() {
         document.getElementById('reference-image-container').style.display = 'block';
         document.getElementById('buttons-container').style.display = 'block';
         document.getElementById('progress-section').style.display = 'block';
+        // document.getElementById('completion-message').style.display = 'none';
     } else {
         // Hide the image container and show the finish button when all trials are completed
         document.getElementById('finish').style.display = 'block';
@@ -106,6 +108,7 @@ function loadImages() {
         document.getElementById('image-container').style.display = 'none';
         document.getElementById('buttons-container').style.display = 'none';
         document.getElementById('open-sidebar-btn').style.display = 'none';
+        // document.getElementById('completion-message').style.display = 'none';
     }
 }
 
@@ -192,6 +195,7 @@ document.getElementById('start-button').addEventListener('click', function() {
     }
 
     document.getElementById('participant-container').style.display = 'none'; // Hide the name input section
+    // document.getElementById('completion-message').style.display = 'none';
     // Show the image containers and buttons 
     document.getElementById('reference-image-container').style.display = 'block';
     document.getElementById('image-container').style.display = 'block';
@@ -210,7 +214,40 @@ document.getElementById('start-button').addEventListener('click', function() {
 
 // Generate and download the CSV after all trials
 document.getElementById('finish').addEventListener('click', function() {
-    downloadCSV(); // Call the function to download CSV
+    // downloadCSV(); // Call the function to download CSV
+
+    const csvContent = d3.csvFormat(trialData);  
+
+    // submit the results to the server
+    fetch('/submit_results', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            participant: participantName,
+            csv: csvContent
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Your results have been submitted successfully.");
+        window.location.href = '/finish'; // Redirect to the final page
+        // if (data.message === 'result') {
+        //     // Show completion message
+        //     document.getElementById('completion-message').style.display = 'flex';
+        //     // Hide the image containers and buttons
+        //     document.getElementById('reference-image-container').style.display = 'none';
+        //     document.getElementById('image-container').style.display = 'none';
+        //     document.getElementById('buttons-container').style.display = 'none';
+        //     document.getElementById('progress-section').style.display = 'none';
+        //     document.getElementById('open-sidebar-btn').style.display = 'none';
+        // }
+    })
+    .catch(error => {
+        console.error('ERROR:', error);
+        alert("An error occurred while submitting your results. Please try again.");
+    });
 });
 
 // Function to generate and download the CSV file using D3.js
