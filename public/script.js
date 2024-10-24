@@ -1,3 +1,5 @@
+// public/script.js
+
 // Generate a random participant name using a combination of letters
 function generateRandomName() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -15,10 +17,9 @@ function getFileNameFromPath(path) {
 
 let trialData = [];
 let trialNum = 1; // Start with trial 1
-let participantName = ""; // Generate random participant name
-let testImages = [];
-let refImages = [];
-let trialDelay = 500; // 1 second delay between trials
+let participantName = ""; // Participant name
+let trials = []; // Array to store trial data from server
+let trialDelay = 500; // 0.5 second delay between trials
 
 // Function to shuffle an array randomly
 function shuffleArray(array) {
@@ -29,33 +30,33 @@ function shuffleArray(array) {
     return array;
 }
 
-// Fetch images dynamically from the server
-async function fetchImages() {
-    const response = await fetch('/images'); // Fetch the image data from the server
-    const data = await response.json();
+// Fetch trials data from the server
+async function fetchTrials() {
+    try {
+        const response = await fetch('/api/trials'); // Fetch the trial data from the server
+        const data = await response.json();
 
-    // Group test images in pairs of A and B
-    for (let i = 0; i < data.testImages.length; i += 2) {
-        testImages.push({ imgA: data.testImages[i], imgB: data.testImages[i + 1] });
+        console.log('Fetched trials data:', data); // Debugging log
+
+        if (data.length === 0) {
+            alert("No trial data found.");
+            return;
+        }
+
+        // Shuffle trials for randomness
+        trials = shuffleArray(data);
+
+        console.log('Shuffled trials:', trials); // Debugging log
+
+        // Set the total number of trials
+        document.getElementById('total-trials').innerText = trials.length;
+
+        // Start the first trial after a brief delay
+        loadTrialWithDelay();
+    } catch (error) {
+        console.error('Error fetching trial data:', error);
+        alert("Error fetching trial data. Please try again later.");
     }
-
-    // Store reference images from the 'ref' folder
-    refImages = data.refImages;
-
-    // Shuffle test images for randomness
-    testImages = shuffleArray(testImages);
-
-    // Set the total number of trials at the start
-    document.getElementById('total-trials').innerText = testImages.length;
-
-    // Start the task by loading the first set of images after a blank screen
-    loadTrialWithDelay();
-}
-
-// Randomly select a reference image for the current trial
-function getRandomRefImage() {
-    const randomIndex = Math.floor(Math.random() * refImages.length);
-    return refImages[randomIndex];
 }
 
 // Display blank screen for a given amount of time
@@ -64,7 +65,6 @@ function showBlankScreen(callback) {
     document.getElementById('reference-image-container').style.display = 'none';
     document.getElementById('buttons-container').style.display = 'none';
     document.getElementById('progress-section').style.display = 'none';
-    // document.getElementById('completion-message').style.display = 'none';
 
     setTimeout(() => {
         callback();
@@ -73,105 +73,120 @@ function showBlankScreen(callback) {
 
 // Function to update the progress bar
 function updateProgressBar() {
-    const progressPercent = (trialNum / testImages.length) * 100;
-    document.getElementById('progress-bar').style.width = progressPercent + '%';
+    const progressPercent = ((trialNum - 1) / trials.length) * 100;
+    document.getElementById('progress-bar').style.width = `${progressPercent}%`;
 }
 
 // Load the images for the current trial
 function loadImages() {
-    if (trialNum <= testImages.length) {
+    if (trialNum <= trials.length) {
+        const trial = trials[trialNum - 1];
+
         // Update the trial number and progress bar
         document.getElementById('current-trial').innerText = trialNum;
         updateProgressBar();
 
-        // Show the reference image first
-        const imgRefSrc = getRandomRefImage();
-        document.getElementById('imgRef').src = imgRefSrc;
+        // Set the reference image
+        document.getElementById('imgRef').src = trial.referenceImage;
+        console.log(trial.referenceImage);
 
-        // Shuffle imgA and imgB for randomness within each trial
-        let currentTestImages = shuffleArray([testImages[trialNum - 1].imgA, testImages[trialNum - 1].imgB]);
+        // Set Image A and Image B
+        document.getElementById('imgA').src = trial.imageA;
+        document.getElementById('imgB').src = trial.imageB;
 
-        // Display the shuffled test images (imgA and imgB)
-        document.getElementById('imgA').src = currentTestImages[0];
-        document.getElementById('imgB').src = currentTestImages[1];
+        // Update image texts with filenames
+        document.getElementById('imgAText').innerText = `Image A`;
+        document.getElementById('imgBText').innerText = `Image B`;
 
-        // Show the image container again after the blank screen
+        // Show the image containers
         document.getElementById('image-container').style.display = 'block';
         document.getElementById('reference-image-container').style.display = 'block';
         document.getElementById('buttons-container').style.display = 'block';
         document.getElementById('progress-section').style.display = 'block';
-        // document.getElementById('completion-message').style.display = 'none';
     } else {
-        // Hide the image container and show the finish button when all trials are completed
-        document.getElementById('finish').style.display = 'block';
+        // All trials completed, show finish section
         document.getElementById('reference-image-container').style.display = 'none';
         document.getElementById('image-container').style.display = 'none';
         document.getElementById('buttons-container').style.display = 'none';
-        document.getElementById('open-sidebar-btn').style.display = 'none';
-        // document.getElementById('completion-message').style.display = 'none';
+        document.getElementById('progress-section').style.display = 'none';
+        document.getElementById('finish').style.display = 'block';
     }
 }
 
 // Load the trial with a delay (blank screen in between)
 function loadTrialWithDelay() {
     showBlankScreen(() => {
-        loadImages(); // Load the next pair of images after the blank screen
+        loadImages(); // Load the next trial after the blank screen
     });
 }
 
 // Record the selection and proceed to the next trial
 document.getElementById('selectImgA').addEventListener('click', function() {
-    handleSelection(true, 'selectImgA'); // User selected Image A
+    handleSelection('A');
 });
 
 document.getElementById('selectImgB').addEventListener('click', function() {
-    handleSelection(false, 'selectImgB'); // User selected Image B
+    handleSelection('B');
 });
 
 // Handle selection and ensure button highlight before blank screen
-function handleSelection(isImgASelected, buttonId) {
+function handleSelection(choice) {
+    const buttonId = choice === 'A' ? 'selectImgA' : 'selectImgB';
     highlightButton(buttonId); // Highlight the button for feedback
+
     setTimeout(() => {
-        recordSelection(isImgASelected); // Proceed to record selection after the highlight effect
+        recordSelection(choice); // Proceed to record selection after the highlight effect
     }, 300); // Wait for button highlight effect to finish before recording selection
 }
 
+// Highlight the selected button
+function highlightButton(buttonId) {
+    const button = document.getElementById(buttonId);
+    button.classList.add('selected'); // Add the 'selected' class
+
+    // Remove the highlight after 500ms to simulate a brief effect
+    setTimeout(() => {
+        button.classList.remove('selected');
+    }, 500);
+}
+
 // Record the selection and load the next trial after a delay (blank screen)
-function recordSelection(isImgASelected) {
-    // Store the current trial data
-    const currentRefImage = document.getElementById('imgRef').src.replace(window.location.origin, '');  // Get the current reference image
+function recordSelection(choice) {
+    const trial = trials[trialNum - 1];
 
     trialData.push({
-        trial: trialNum,  // Current trial number
-        participant: participantName,  // Randomly generated participant name
-        imgRef: currentRefImage,  // Reference image path
-        imgA: testImages[trialNum - 1].imgA,  // Image A path
-        imgB: testImages[trialNum - 1].imgB,  // Image B path
-        isImgASelected: isImgASelected  // Whether Image A was selected (true/false)
+        trialNum: trialNum, // Trial number
+        participant: participantName, // Participant name
+        trialName: trial.trialName, // Trial name
+        randomSeed: trial.randomSeed, // Random seed
+        referenceImage: getFileNameFromPath(trial.referenceImage), // Reference image path
+        imageA: getFileNameFromPath(trial.imageA), // Image A path
+        imageB: getFileNameFromPath(trial.imageB), // Image B path
+        choice: choice, // 'A' or 'B'
+        // timestamp: new Date().toISOString() // Timestamp
     });
 
     trialNum++; // Increment the trial number
     loadTrialWithDelay(); // Show blank screen and load the next trial
 }
 
-function highlightButton(buttonId) {
-    const button = document.getElementById(buttonId);
-    button.classList.add('selected'); // Add the 'selected' class
-
-    // Remove the highlight after 300ms to simulate a brief effect
-    setTimeout(() => {
-        button.classList.remove('selected');
-    }, 500);
-}
-
 // Listen for keypresses to select imgA or imgB
 document.addEventListener('keydown', function(event) {
     if (event.key === 'a' || event.key === 'A') {
-        handleSelection(true, 'selectImgA');  // User selected Image A with 'A' key
+        handleSelection('A');  // User selected Image A with 'A' key
     } else if (event.key === 'b' || event.key === 'B') {
-        handleSelection(false, 'selectImgB');  // User selected Image B with 'B' key
+        handleSelection('B');  // User selected Image B with 'B' key
     }
 });
+
+// Sidebar open/close functions
+// function openNav() {
+//     document.getElementById("instruction-sidebar").style.width = "250px";
+// }
+
+// function closeNav() {
+//     document.getElementById("instruction-sidebar").style.width = "0";
+// }
 
 function openNav() {
     document.getElementById("instruction-sidebar").classList.add("open");
@@ -183,11 +198,12 @@ function closeNav() {
     document.getElementById("main-content").style.marginRight = "0"; // Reset main content position
 }
 
+
 // Start the experiment when the user enters their name or auto-generates a name
 document.getElementById('start-button').addEventListener('click', function() {
-    const inputName = document.getElementById('participant-name').value;
-    
-    if (inputName.trim() !== "") {
+    const inputName = document.getElementById('participant-name').value.trim();
+
+    if (inputName !== "") {
         participantName = inputName; // Set the participant name from input
     } else {
         participantName = generateRandomName(); // Generate random participant name if input is empty
@@ -195,30 +211,32 @@ document.getElementById('start-button').addEventListener('click', function() {
     }
 
     document.getElementById('participant-container').style.display = 'none'; // Hide the name input section
-    // document.getElementById('completion-message').style.display = 'none';
-    // Show the image containers and buttons 
+    document.getElementById('instruction-container').style.display = 'none'; // Hide the instruction section
+
+    // Show the image containers and progress section
     document.getElementById('reference-image-container').style.display = 'block';
     document.getElementById('image-container').style.display = 'block';
     document.getElementById('buttons-container').style.display = 'block';
     document.getElementById('progress-section').style.display = 'block';
-    
-    document.getElementById('instruction-container').style.display = 'none';
 
-    // Fetch images and start the experiment
-    fetchImages();
+    // Fetch trials data and start the experiment
+    fetchTrials();
 
     // Show the sidebar toggle button after the trial starts
-    document.getElementById('open-sidebar-btn').style.display = 'block'; 
+    document.getElementById('open-sidebar-btn').style.display = 'block';
     document.getElementById('instruction-sidebar').style.display = 'block'; // Show the sidebar initially
 });
 
-// Generate and download the CSV after all trials
+// Finish and upload CSV
 document.getElementById('finish').addEventListener('click', function() {
-    // downloadCSV(); // Call the function to download CSV
+    submitResults();
+});
 
+// Submit the results to the server
+function submitResults() {
     const csvContent = d3.csvFormat(trialData);  
 
-    // submit the results to the server
+    // Send the results to the server
     fetch('/submit_results', {
         method: 'POST',
         headers: {
@@ -231,26 +249,21 @@ document.getElementById('finish').addEventListener('click', function() {
     })
     .then(response => response.json())
     .then(data => {
-        alert("Your results have been submitted successfully.");
-        window.location.href = '/finish'; // Redirect to the final page
-        // if (data.message === 'result') {
-        //     // Show completion message
-        //     document.getElementById('completion-message').style.display = 'flex';
-        //     // Hide the image containers and buttons
-        //     document.getElementById('reference-image-container').style.display = 'none';
-        //     document.getElementById('image-container').style.display = 'none';
-        //     document.getElementById('buttons-container').style.display = 'none';
-        //     document.getElementById('progress-section').style.display = 'none';
-        //     document.getElementById('open-sidebar-btn').style.display = 'none';
-        // }
+        if (data.message === 'result uploaded Google Drive') {
+            // Redirect to the finish route for final redirection
+            alert("Successfully uploaded results to Google Drive.");
+            window.location.href = '/finish';
+        } else {
+            alert("Error uploading results. Please try again later.");
+        }
     })
     .catch(error => {
-        console.error('ERROR:', error);
-        alert("An error occurred while submitting your results. Please try again.");
+        console.error('Error: ', error);
+        alert("Error uploading results. Please try again later.");
     });
-});
+}
 
-// Function to generate and download the CSV file using D3.js
+// Function to generate and download the CSV file using D3.js (optional, not used in current flow)
 function downloadCSV() {
     // Convert trial data to CSV format
     const csvContent = d3.csvFormat(trialData);

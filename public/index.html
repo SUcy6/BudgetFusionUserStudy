@@ -26,34 +26,34 @@
         <p>Your task is to select the image that is more similar to the reference image.</p>
         <p>Click on the button below or press keyboard to make the selection.</p>
         <p>Enter your unique Prolific ID below to start the trial. If you do not enter a name, a random name will be given to you.</p>
-        <p>In the end, click on the "Finish and Download CSV" button to download the results.</p>
+        <p>In the end, click on the "Finish and Upload CSV" button to download the results.</p>
     </div>
     <div id="participant-container">
         <label for="participant-name">Participant ID:</label>
         <input type="text" id="participant-name" placeholder="Your Name" required>
         <button id="start-button">Start Selection</button>
     </div>
-    <div id="progress-section" style="text-align: center; margin-top: 20px;">
+    <div id="progress-section" style="text-align: center; margin-top: 10px;">
         <div id="progress-tracker">
             Trial <span id="current-trial">1</span> / <span id="total-trials">0</span>
         </div>
-        <div id="progress-container" style="width: 80%; background-color: #f3f3f3; border-radius: 25px; margin: 20px auto;">
+        <div id="progress-container" style="width: 80%; background-color: #f3f3f3; border-radius: 25px; margin: 10px auto;">
             <div id="progress-bar" style="width: 0%; height: 25px; background-color: #008080; border-radius: 25px;"></div>
         </div>
     </div>
     <div id="reference-image-container">
-        <img id="imgRef" src="" alt="Reference Image" width="350">
-        <h4>Reference Image</h4>
+        <img id="imgRef" src="" alt="Reference Image" width="330">
+        <p>Reference Image</p>
     </div>
     <div id="image-container">
         <div class="image-row">
             <div class="image-box">
                 <img id="imgA" class="image">
-                <h4 id="imgAText">Image A</h4>
+                <p id="imgAText">Image A</p>
             </div>
             <div class="image-box">
                 <img id="imgB" class="image">
-                <h4 id="imgBText">Image B</h4>
+                <p id="imgBText">Image B</p>
             </div>
         </div>
     </div>

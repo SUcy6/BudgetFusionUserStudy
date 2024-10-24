@@ -26,6 +26,55 @@ const auth = new google.auth.GoogleAuth({
 
 const drive = google.drive({ version: 'v3', auth });
 
+function getAllTrials(imgDir) {
+    const trials = [];
+    const trialFolders = fs.readdirSync(imgDir).filter(folder => {
+        return fs.statSync(path.join(imgDir, folder)).isDirectory();
+    });
+
+    trialFolders.forEach(trial => {
+        const trialPath = path.join(imgDir, trial);
+        const subfolders = fs.readdirSync(trialPath).filter(subfolder => {
+            return fs.statSync(path.join(trialPath, subfolder)).isDirectory();
+        });
+
+        if (subfolders.length === 0) {
+            console.warn(`Trial ${trial} has no subfolders`);
+            return;
+        }
+
+        const subfolderPath = path.join(trialPath, subfolders[0]);
+        const images = fs.readdirSync(subfolderPath).filter(file => file.endsWith('.png'));
+
+        if (!images.includes('129.png')) {
+            console.warn(`Trial ${trial} subfolder doesn't have 129.png`);
+            return;
+        }
+
+        const otherImages = images.filter(file => file !== '129.png');
+
+        const shuffled = otherImages.sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, 2);
+
+        trials.push({
+            trialName: trial,
+            randomSeed: subfolders[0],
+            referenceImage: path.join('img', trial, subfolders[0], '129.png'),
+            imageA: path.join('img', trial, subfolders[0], selected[0]),
+            imageB: path.join('img', trial, subfolders[0], selected[1]),
+        });
+    });
+
+    return trials;
+}
+
+// Endpoint to get all trials
+app.get('/api/trials', (req, res) => {
+    const imgDirectory = path.join(__dirname, 'public', 'img');
+    const trials = getAllTrials(imgDirectory);
+    res.json(trials);
+});
+
 // Endpoint to submit results to Google Drive
 app.post('/submit_results', async (req, res) => {
     const { participant, csv } = req.body;
